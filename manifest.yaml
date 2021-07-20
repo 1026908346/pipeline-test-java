@@ -1,0 +1,37 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: solution-test-xlauncher1-lstack.lstack.com.cn-default-secret
+  namespace: app-2487677631
+data:
+  .dockerconfigjson: >-
+    eyJhdXRocyI6eyJzb2x1dGlvbi10ZXN0LXhsYXVuY2hlcjEtbHN0YWNrLmxzdGFjay5jb20uY24iOnsiYXV0aCI6IllXUnRhVzQ2VXpkMk5uUTNUakp3TWc9PSJ9fX0=
+type: kubernetes.io/dockerconfigjson
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: lyf-1
+  namespace: app-2487677631
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lyf-1
+      created-by: lstack-lcr
+  template:
+    metadata:
+      labels:
+        app: lyf-1
+        created-by: lstack-lcr
+    spec:
+      containers:
+        - name: container0
+          image: solution-test-xlauncher1-lstack.lstack.com.cn/nonghe-zl/aaa:v1
+          resources: {}
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: solution-test-xlauncher1-lstack.lstack.com.cn-default-secret
+  strategy: {}
+status: {}
