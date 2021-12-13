@@ -25,12 +25,12 @@ jobs:
   docker_build:
     docker:
       - image: cimg/openjdk:11.0
-        auth:
-          username: Lstack1
-          password: Launcher@1302  # context / project UI env-var reference
+      #   auth:
+      #     username: Lstack1
+      #     password: Launcher@1302  # context / project UI env-var reference
     steps:
       - checkout
-      - run: docker build -t registry.cn-hangzhou.aliyuncs.com/launcher/lyf-demo:v1
+      - run: docker login --username=liyifeng@xlauncher registry.cn-hangzhou.aliyuncs.com -p=Liyifeng0 && docker build -t registry.cn-hangzhou.aliyuncs.com/launcher/lyf-demo:v1 && docker push registry.cn-hangzhou.aliyuncs.com/launcher/lyf-demo:v1
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
