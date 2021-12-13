@@ -1,0 +1,320 @@
+---
+kind: Task
+apiVersion: tekton.dev/v1beta1
+metadata:
+  name: 540a08b5-d159-44d8-931d-07fa32740343
+  namespace: lstack-cicd
+  creationTimestamp: null
+  annotations:
+    lstack.dev/custom_task_position: 0-0-0
+    lstack.dev/custom_taskname: code
+spec:
+  params:
+    - name: revision
+      type: string
+      default: ''
+    - name: refspec
+      type: string
+      default: ''
+    - name: submodules
+      type: string
+      default: 'true'
+    - name: depth
+      type: string
+      default: '1'
+    - name: sslVerify
+      type: string
+      default: 'true'
+    - name: subdirectory
+      type: string
+      default: ''
+    - name: deleteExisting
+      type: string
+      default: 'true'
+    - name: httpProxy
+      type: string
+      default: ''
+    - name: httpsProxy
+      type: string
+      default: ''
+    - name: noProxy
+      type: string
+      default: ''
+    - name: gitInitImage
+      type: string
+      default: 'registry.cn-hangzhou.aliyuncs.com/launcher/git-init:v0.14.2'
+  description: git_clone
+  steps:
+    - name: clone0-0-0-0
+      image: $(params.gitInitImage)
+      resources: {}
+      imagePullPolicy: Always
+      script: "CHECKOUT_DIR=\"$(workspaces.output.path)/$(params.subdirectory)\"\n\n\t\tcleandir() {\n\t\t  if [[ -d \"$CHECKOUT_DIR\" ]]; then\n\t\t\trm -rf \"$CHECKOUT_DIR\"/*\n\t\t\trm -rf \"$CHECKOUT_DIR\"/.[!.]*\n\t\t\trm -rf \"$CHECKOUT_DIR\"/..?*\n\t\t  fi\n\t\t}\n\t\t\n\t\tif [[ \"$(params.deleteExisting)\" == \"true\" ]] ; then\n\t\t  cleandir\n\t\tfi\n\t\t\n\t\t\n\t\ttest -z \"$(params.httpProxy)\" || export HTTP_PROXY=$(params.httpProxy)\n\t\t\n\t\ttest -z \"$(params.httpsProxy)\" || export\n\t\tHTTPS_PROXY=$(params.httpsProxy)\n\t\t\n\t\ttest -z \"$(params.noProxy)\" || export NO_PROXY=$(params.noProxy)\n\t\t\n\t\t# 如果ssh克隆代码，配置ssh key\n\t\tif [[ \"https\" == \"ssh\" ]] ; then\n\t\t\tmkdir -p /root/.ssh\n\t\t\tcp /tekton/home/.ssh/id_rsa /root/.ssh/id_rsa\n\t\t\techo StrictHostKeyChecking=no > /etc/ssh/ssh_config\n\t\t\tcat /root/.ssh/id_rsa\n\t\tfi\n\t\t\n\t\t/ko-app/git-init \\\n\t\t  -url \"https://liyifeng1026908346:5e9e706cd9a1d6bd30f39bd8ef2f5071@gitee.com/liyifeng1026908346/pipeline-test-java.git\" \\\n\t\t  -revision \"$(params.revision)\" \\\n\t\t  -refspec \"$(params.refspec)\" \\\n\t\t  -path \"$CHECKOUT_DIR\" \\\n\t\t  -sslVerify=\"$(params.sslVerify)\" \\\n\t\t  -submodules=\"$(params.submodules)\" \\\n\t\t  -depth \"$(params.depth)\"\n\t\tcd \"$CHECKOUT_DIR\"\n\t\t\n\t\t# 代码库的分支名或者 Tag 名（根据用户运行时选择），比如 master or V1.0\n\t\tSYS_COMMIT_REF_NAME=\"$(params.revision)\"\n\t\t\n\t\tEXIT_CODE=\"$?\"\n\t\t\n\t\tif [ \"$EXIT_CODE\" != 0 ]\n\t\t\n\t\tthen\n\t\t  exit $EXIT_CODE\n\t\tfi\n\t\t\n\t\t# 最后一次提交的代码版本的 commit ID：如2bfb63d779e3648c91950f82d374a25784cdabaf\n\t\tSYS_COMMIT_SHA=\"$(git rev-parse HEAD)\"\n\t\t\n\t\tEXIT_CODE=\"$?\"\n\t\t\n\t\tif [ \"$EXIT_CODE\" != 0 ]\n\t\t\n\t\tthen\n\t\t  exit $EXIT_CODE\n\t\tfi\n\t\t\n\t\t# 最后一次提交的代码版本的 8 位 commit ID，如b4dadc7\n\t\tSYS_COMMIT_ID=\"$(git rev-parse --short HEAD)\"\n\t\t\n\t\tEXIT_CODE=\"$?\"\n\t\t\n\t\tif [ \"$EXIT_CODE\" != 0 ]\n\t\t\n\t\tthen\n\t\t  exit $EXIT_CODE\n\t\tfi\n\t\t\n\t\t\n\t\techo -n \"$SYS_COMMIT_REF_NAME\" > $(results.sys_commit_ref_name.path)\n\t\t\n\t\techo -n \"$SYS_COMMIT_SHA\" > $(results.sys_commit_sha.path)\n\t\t\n\t\techo -n \"$SYS_COMMIT_ID\" > $(results.sys_commit_id.path)"
+  workspaces:
+    - name: output
+  results:
+    - name: sys_commit_ref_name
+      description: ''
+    - name: sys_commit_sha
+      description: ''
+    - name: sys_commit_id
+      description: ''
+---
+kind: Task
+apiVersion: tekton.dev/v1beta1
+metadata:
+  name: ec9a53e3-3be1-4e6e-bb7a-b38cfc8e0611
+  namespace: lstack-cicd
+  creationTimestamp: null
+  annotations:
+    lstack.dev/custom_task_position: 1-0-0
+    lstack.dev/custom_taskname: 新的任务
+spec:
+  params:
+    - name: PROXY_HOST1-0-0-0
+      type: string
+      default: ''
+    - name: PROXY_NON_PROXY_HOSTS1-0-0-0
+      type: string
+      default: ''
+    - name: PROXY_PASSWORD1-0-0-0
+      type: string
+      default: ''
+    - name: PROXY_PORT1-0-0-0
+      type: string
+      default: ''
+    - name: PROXY_PROTOCOL1-0-0-0
+      type: string
+      default: http
+    - name: PROXY_USER1-0-0-0
+      type: string
+      default: ''
+    - name: MVN_CONTEXT_DIR1-0-0-0
+      type: string
+      default: .
+  description: java_build
+  steps:
+    - name: default-mvn-settings-xml1-0-0-0
+      image: registry.cn-hangzhou.aliyuncs.com/launcher/mvn
+      workingDir: $(workspaces.source1-0-0-0.path)/$(params.MVN_CONTEXT_DIR1-0-0-0)
+      resources: {}
+      imagePullPolicy: Always
+      script: "#!/usr/bin/env bash\n\necho 'maven-setting...'\n\n[[ -f $(workspaces.maven-settings1-0-0-0.path)/settings.xml ]] && \\\n\necho 'using existing $(workspaces.maven-settings1-0-0-0.path)/settings.xml' &&\nexit 0\n\n\ncat > $(workspaces.source1-0-0-0.path)/settings.xml <<EOF\n\n<settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\"\n\t\txmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n\t\txsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\">\n  <mirrors>\n    <!-- The mirrors added here are generated from environment variables. Don't change. -->\n    <!-- ### mirrors from ENV ### -->\n\t   <mirror>\n\t\t<id>nexus-aliyun</id>\n\t\t<name>Nexus aliyun</name>\n\t\t<url>http://maven.aliyun.com/nexus/content/groups/public/</url>\n\t\t<mirrorOf>central</mirrorOf>\n\t   </mirror>\n  </mirrors>\n  <proxies>\n    <!-- The proxies added here are generated from environment variables. Don't change. -->\n    <!-- ### HTTP proxy from ENV ### -->\n  </proxies>\n</settings>\n\nEOF\n\n\nxml=\"\"\n\nif [ -n \"$(params.PROXY_HOST1-0-0-0)\" -a -n \"$(params.PROXY_PORT1-0-0-0)\" ]; then\n  xml=\"<proxy>\\\n    <id>genproxy</id>\\\n    <active>true</active>\\\n    <protocol>$(params.PROXY_PROTOCOL1-0-0-0)</protocol>\\\n    <host>$(params.PROXY_HOST1-0-0-0)</host>\\\n    <port>$(params.PROXY_PORT1-0-0-0)</port>\"\n  if [ -n \"$(params.PROXY_USER1-0-0-0)\" -a -n \"$(params.PROXY_PASSWORD1-0-0-0)\" ]; then\n    xml=\"$xml\\\n        <username>$(params.PROXY_USER1-0-0-0)</username>\\\n <password>$(params.PROXY_PASSWORD1-0-0-0)</password>\"\n  fi\n  if [ -n \"$(params.PROXY_NON_PROXY_HOSTS1-0-0-0)\" ]; then\n    xml=\"$xml\\\n        <nonProxyHosts>$(params.PROXY_NON_PROXY_HOSTS1-0-0-0)</nonProxyHosts>\"\n  fi\n  xml=\"$xml\\\n      </proxy>\"\n  sed -i \"s|<!-- ### HTTP proxy fromENV ### -->|$xml|\" $(workspaces.maven-settings1-0-0-0.path)/settings.xml\nfi\n\necho \"$(params.PROXY_HOST1-0-0-0)\"\n\nif [ -n \"$(params.PROXY_HOST1-0-0-0)\" ]; then\n  xml=\"  <mirror>\\\n    <id>mirror.default</id>\\\n    <url>$(params.PROXY_HOST1-0-0-0)</url>\\\n    <mirrorOf>central</mirrorOf>\\\n  </mirror>\"\n  sed -i \"s|<!-- ### mirrors from ENV ### -->|$xml|\" $(workspaces.maven-settings1-0-0-0.path)/settings.xml\nfi\n\necho 'maven-setting configured'\n\ncat $(workspaces.source1-0-0-0.path)/settings.xml"
+    - name: mvn-goals1-0-0-0
+      image: registry.cn-hangzhou.aliyuncs.com/launcher/mvn
+      workingDir: $(workspaces.source1-0-0-0.path)/$(params.MVN_CONTEXT_DIR1-0-0-0)
+      resources: {}
+      volumeMounts:
+        - name: maven-repo
+          mountPath: /root/.m2/
+      imagePullPolicy: Always
+      script: "# 功能：  打包\n# 参数说明：\n#\t\t-Dmaven.test.skip=true：跳过单元测试\n#\t\t-U：每次构建检查依赖更新，可避免缓存中快照版本依赖不更新问题，但会牺牲部分性能\n#\t\t-e -X ：打印调试信息，定位疑难构建问题时建议使用此参数构建\n#\t\t-B：以batch模式运行，可避免日志打印时出现ArrayIndexOutOfBoundsException异常\n# 使用场景： 打包项目且不需要执行单元测试时使用\nmvn -Dmaven.test.skip=true -s settings.xml package\n\n#功能：打包并发布依赖包到私有依赖库\n#使用场景： 需要将当前项目构建结果发布到私有依赖仓库以供其他maven项目引用时使用\n#注意事项： 此处上传的目标仓库可以在插件市场安装（sonatype-nexus），或是自己的maven仓库\n#mvn deploy -Dmaven.test.skip=true -U -e -X -B\n"
+  volumes:
+    - name: maven-repo
+      hostPath:
+        path: /opt/lstack/cnops/384606614490979089/maven-repo/
+  workspaces:
+    - name: source1-0-0-0
+    - name: maven-settings1-0-0-0
+      mountPath: /java-maven-settings0-0-0-0
+---
+kind: Task
+apiVersion: tekton.dev/v1beta1
+metadata:
+  name: f64d42e4-a768-4be7-81aa-8dd4a1f4ad00
+  namespace: lstack-cicd
+  creationTimestamp: null
+  annotations:
+    lstack.dev/custom_task_position: 2-0-0
+    lstack.dev/custom_taskname: 新的任务
+spec:
+  description: docker_build
+  steps:
+    - name: docker-build2-0-0-0
+      image: 'registry.cn-hangzhou.aliyuncs.com/launcher/docker:latest'
+      workingDir: $(workspaces.source2-0-0-0.path)
+      resources: {}
+      volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+      imagePullPolicy: Always
+      script: >-
+        # 1、config ~/.docker/config.json
+
+        mkdir -p /tekton/home/.docker
+
+
+        echo
+        '{"auths":{"registry.cn-beijing.aliyuncs.com/aliyun-beijing":{"auth":"THN0YWNrMTpMYXVuY2hlckAxMzAy"}}}'
+        > /tekton/home/.docker/config.json
+
+
+        cat ~/.docker/config.json
+
+
+        # 2、docker build with build_args
+
+        if [ 'path_dockerfile' = 'path_dockerfile' ]; then
+
+        echo '使用填写的dockerfile路径构建'
+
+        docker build -f ./Dockerfile -t
+        registry.cn-beijing.aliyuncs.com/aliyun-beijing/demo:v1 ./
+
+        elif [ 'path_dockerfile' = 'page_dockerfile' ]; then
+
+        echo '使用页面填写的dockerfile构建'
+
+        echo '' > /workspace/Dockerfile
+
+        cat /workspace/Dockerfile
+
+        docker build  -f /workspace/Dockerfile -t
+        registry.cn-beijing.aliyuncs.com/aliyun-beijing/demo:v1 ./
+
+        else
+
+        echo 既没有指定dockerfile路径，也没有填写内容
+
+        exit -1
+
+        fi
+    - name: docker-push2-0-0-0
+      image: 'registry.cn-hangzhou.aliyuncs.com/launcher/docker:latest'
+      workingDir: $(workspaces.source2-0-0-0.path)
+      resources: {}
+      volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+      imagePullPolicy: Always
+      script: 'docker push registry.cn-beijing.aliyuncs.com/aliyun-beijing/demo:v1'
+    - name: docker-rm2-0-0-0
+      image: 'registry.cn-hangzhou.aliyuncs.com/launcher/docker:latest'
+      resources: {}
+      volumeMounts:
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+      imagePullPolicy: Always
+      script: >-
+        IMAGE_ID=`docker images | grep -i
+        registry.cn-beijing.aliyuncs.com/aliyun-beijing/demo |awk '{print $3}'`
+
+        docker rmi -f ${IMAGE_ID}
+  volumes:
+    - name: docker-socket
+      hostPath:
+        path: /var/run/docker.sock
+  workspaces:
+    - name: source2-0-0-0
+---
+kind: Pipeline
+apiVersion: tekton.dev/v1beta1
+metadata:
+  name: 5856040f-23cd-4bbe-a6e6-dac01fc35795
+  namespace: lstack-cicd
+  creationTimestamp: null
+spec:
+  tasks:
+    - name: git-clone-0-0-0
+      taskRef:
+        name: 540a08b5-d159-44d8-931d-07fa32740343
+      params:
+        - name: revision
+          value: $(params.git-clone-revision0-0-0-0)
+      workspaces:
+        - name: output
+          workspace: source0-0-0-0
+    - name: java-build-1-0-0
+      taskRef:
+        name: ec9a53e3-3be1-4e6e-bb7a-b38cfc8e0611
+      runAfter:
+        - git-clone-0-0-0
+      workspaces:
+        - name: maven-settings1-0-0-0
+          workspace: maven-settings1-0-0-0
+        - name: source1-0-0-0
+          workspace: source0-0-0-0
+    - name: docker-build-2-0-0
+      taskRef:
+        name: f64d42e4-a768-4be7-81aa-8dd4a1f4ad00
+      runAfter:
+        - java-build-1-0-0
+      workspaces:
+        - name: source2-0-0-0
+          workspace: source0-0-0-0
+  params:
+    - name: git-clone-revision0-0-0-0
+      type: string
+  workspaces:
+    - name: source0-0-0-0
+    - name: maven-settings1-0-0-0
+  finally:
+    - name: cleanup-source0-0-0-0
+      taskRef:
+        name: cleanup
+      workspaces:
+        - name: source
+          workspace: source0-0-0-0
+---
+kind: PipelineRun
+apiVersion: tekton.dev/v1beta1
+metadata:
+  name: b52bec78-93cf-4c6e-84c3-3d5f5397f099
+  namespace: lstack-cicd
+  creationTimestamp: null
+  annotations:
+    lstack.dev/custom: >-
+      {"isPrimaryAuthUser":true,"primaryAccountId":"b0959625051d4b079ca988f7d2c08482","primaryAccountName":"xlauncher1","accountId":"b0959625051d4b079ca988f7d2c08482","accountName":"xlauncher1","token":"%7B%22primaryAuthUser%22%3A%7B%22createdTime%22%3A1636729533000%2C%22domainId%22%3A%2293ff687c9ce6458f891300bf00ad3882%22%2C%22harborEmail%22%3A%22b0959625051d4b079ca988f7d2c08482%40harbor.com%22%2C%22harborPassword%22%3A%22f5d7R9v3G5%22%2C%22id%22%3A%22d13158a4-d17d-4fea-91cf-e06ac8a73a3a%22%2C%22keystoneUserId%22%3A%22b0959625051d4b079ca988f7d2c08482%22%2C%22keystoneUserName%22%3A%22xlauncher1%22%2C%22phone%22%3A%2217879525579%22%2C%22projectId%22%3A%221fd43a25db2e4f078d7d5e22aa77b932%22%2C%22updateTime%22%3A1636729533000%7D%2C%22isPrimaryAuthUser%22%3Atrue%7D","harborPassword":"f5d7R9v3G5","IsPlantFormAdmin":false,"IsProjectManager":false,"Page":0,"PageSize":0,"SearchKey":"","SearchValue":"","variables":[{"runningConfig":false,"name":"SYS_TIMESTAMP","description":"启动流水线的时间","value":"系统自动生成","type":"system"},{"runningConfig":true,"name":"SYS_COMMIT_REF_NAME","description":"代码库的分支名或者
+      Tag 名（根据用户运行时选择），比如 master or
+      V1.0","value":"系统自动生成","type":"system"},{"runningConfig":false,"name":"SYS_COMMIT_SHA","description":"最后一次提交的代码版本的
+      commit
+      ID：如2bfb63d779e3648c91950f82d374a25784cdabaf","value":"系统自动生成","type":"system"},{"runningConfig":false,"name":"SYS_COMMIT_ID","description":"最后一次提交的代码版本的8位commit
+      ID，如b4dadc7","value":"系统自动生成","type":"system"}],"notifyConfiguration":{"notifyType":"","emailConfiguration":{"address":"","runPoint":null}},"triggerConfigurationList":null,"ProjectId":"384606614490979089","PipelineGroupId":"7e559698-6a01-4d60-824e-af8a95774825","pipelineName":"语法定义","URIPipelineGroupId":"","URIPipelineId":"","Description":"","Stages":[{"stageName":"code","description":"","jobs":[[{"taskName":"code","taskType":"","description":"","steps":[{"stepId":"16393666164541","stepName":"项目代码源","description":"","stepType":"git_clone","version":"","command":"","source":null,"serviceConfig":{},"url":"https://gitee.com/liyifeng1026908346/pipeline-test-java.git","imageUrl":"https://lstack-mcp-file-bucket.oss-cn-hangzhou.aliyuncs.com/staticfile/icon/gitee.svg","codeTrigger":{"triggerTagCreateEvent":false,"triggerPushEvent":false,"triggerTagCreateEventPolicy":{}},"gitNamespace":"liyifeng1026908346","gitRepos":"pipeline-test-java","gitReposPath":"pipeline-test-java","gitBranch":"master","gitTag":"","refStepId":"","gitId":6252781392320,"gitNamespaceId":4823297,"gitRepoId":11298416,"codehubIsPrivate":false,"gitNamespaceType":"user","codehubHttpsPassword":"","codehubProjectName":"","cloneMode":"https","sshModeConf":{"url":"","privateKey":"","revision":"","repoType":"","repoScope":""},"stepDockerBuild":null,"stepKubectlDeploy":null,"stepSonarScan":null,"stepKubectlSetImage":null,"stepAHSDeploy":null,"stepAHSRelease":null,"sonarScanResult":{"errMsg":""},"startTime":"","endTime":""}],"startTime":"","endTime":"","status":""}]],"startTime":"","endTime":""},{"stageName":"新阶段","description":"","jobs":[[{"taskName":"新的任务","taskType":"","description":"","steps":[{"stepId":"16393666316234","stepName":"Java
+      编译","description":"","stepType":"java_build","version":"registry.cn-hangzhou.aliyuncs.com/launcher/mvn","command":"#
+      功能：  打包\n#
+      参数说明：\n#\t\t-Dmaven.test.skip=true：跳过单元测试\n#\t\t-U：每次构建检查依赖更新，可避免缓存中快照版本依赖不更新问题，但会牺牲部分性能\n#\t\t-e
+      -X
+      ：打印调试信息，定位疑难构建问题时建议使用此参数构建\n#\t\t-B：以batch模式运行，可避免日志打印时出现ArrayIndexOutOfBoundsException异常\n#
+      使用场景： 打包项目且不需要执行单元测试时使用\nmvn -Dmaven.test.skip=true -s settings.xml
+      package\n\n#功能：打包并发布依赖包到私有依赖库\n#使用场景：
+      需要将当前项目构建结果发布到私有依赖仓库以供其他maven项目引用时使用\n#注意事项：
+      此处上传的目标仓库可以在插件市场安装（sonatype-nexus），或是自己的maven仓库\n#mvn deploy
+      -Dmaven.test.skip=true -U -e -X
+      -B\n","source":{"imageUrl":"","codeTrigger":{"triggerTagCreateEvent":false,"triggerPushEvent":false,"triggerTagCreateEventPolicy":{}},"gitNamespace":"","gitRepos":"","gitReposPath":"","gitBranch":"","gitTag":"","refStepId":"16393666164541","gitId":0,"gitNamespaceId":0,"gitRepoId":0,"codehubIsPrivate":false,"gitNamespaceType":"","codehubHttpsPassword":"","codehubProjectName":"","cloneMode":"","sshModeConf":{"url":"","privateKey":"","revision":"","repoType":"","repoScope":""}},"serviceConfig":{},"mavenSettingConf":{"settingsXml":""},"mavenPomConf":{},"mavenCacheEnable":true,"stepDockerBuild":null,"stepKubectlDeploy":null,"stepSonarScan":null,"stepKubectlSetImage":null,"stepAHSDeploy":null,"stepAHSRelease":null,"sonarScanResult":{"errMsg":""},"startTime":"","endTime":""}],"startTime":"","endTime":"","status":""}]],"startTime":"","endTime":""},{"stageName":"新阶段","description":"","jobs":[[{"taskName":"新的任务","taskType":"","description":"","steps":[{"stepId":"163936663728020","stepName":"镜像构建","description":"","stepType":"docker_build","version":"registry.cn-hangzhou.aliyuncs.com/launcher/docker:latest","command":"","source":{"imageUrl":"","codeTrigger":{"triggerTagCreateEvent":false,"triggerPushEvent":false,"triggerTagCreateEventPolicy":{}},"gitNamespace":"","gitRepos":"","gitReposPath":"","gitBranch":"","gitTag":"","refStepId":"16393666164541","gitId":0,"gitNamespaceId":0,"gitRepoId":0,"codehubIsPrivate":false,"gitNamespaceType":"","codehubHttpsPassword":"","codehubProjectName":"","cloneMode":"","sshModeConf":{"url":"","privateKey":"","revision":"","repoType":"","repoScope":""}},"serviceConfig":{},"stepDockerBuild":{"dockerBuildContext":"./","dockerBasicEnv":"custom","dockerfilePath":"./Dockerfile","dockerfileContent":"","dockerReposId":"385190878102166289","artifactName":"demo","artifactVersion":"v1","dockerReposName":"aliyun-beijing","dockerReposUrl":"https://registry.cn-beijing.aliyuncs.com"},"stepKubectlDeploy":null,"stepSonarScan":null,"stepKubectlSetImage":null,"stepAHSDeploy":null,"stepAHSRelease":null,"sonarScanResult":{"errMsg":""},"startTime":"","endTime":""}],"startTime":"","endTime":"","status":""}]],"startTime":"","endTime":""}]}
+    lstack.dev/db_tasks: >-
+      [{"id":0,"createdTime":"2021-12-13T11:37:37.726142194+08:00","updatedTime":"2021-12-13T11:37:37.726142664+08:00","name":"code","pipeline_uid":"5856040f-23cd-4bbe-a6e6-dac01fc35795","pipeline_task_uid":"540a08b5-d159-44d8-931d-07fa32740343","description":"","TektonDescription":"git_clone"},{"id":0,"createdTime":"2021-12-13T11:37:37.726720037+08:00","updatedTime":"2021-12-13T11:37:37.726720364+08:00","name":"新的任务","pipeline_uid":"5856040f-23cd-4bbe-a6e6-dac01fc35795","pipeline_task_uid":"ec9a53e3-3be1-4e6e-bb7a-b38cfc8e0611","description":"","TektonDescription":"java_build"},{"id":0,"createdTime":"2021-12-13T11:37:37.731442826+08:00","updatedTime":"2021-12-13T11:37:37.731443596+08:00","name":"新的任务","pipeline_uid":"5856040f-23cd-4bbe-a6e6-dac01fc35795","pipeline_task_uid":"f64d42e4-a768-4be7-81aa-8dd4a1f4ad00","description":"","TektonDescription":"docker_build"}]
+spec:
+  pipelineRef:
+    name: 5856040f-23cd-4bbe-a6e6-dac01fc35795
+  params:
+    - name: git-clone-revision0-0-0-0
+      value: master
+  timeout: 1h0m0s
+  podTemplate:
+    nodeSelector:
+      node-role.kubernetes.io/infra: 'true'
+    tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoExecute
+  workspaces:
+    - name: source0-0-0-0
+      volumeClaimTemplate:
+        metadata:
+          creationTimestamp: null
+        spec:
+          accessModes:
+            - ReadWriteMany
+          selector:
+            matchLabels:
+              consumer: cops-code-repo
+              module: lstack
+              org: launcher
+              uid: will-be-replaced-when-start
+          resources:
+            requests:
+              storage: 1Gi
+        status: {}
+    - name: maven-settings1-0-0-0
+      emptyDir: {}
+status: {}
