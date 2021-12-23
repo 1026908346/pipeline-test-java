@@ -23,3 +23,7 @@ workflows:
     jobs:
       - mvn
       - docker_build
+  workflow2:
+    jobs:
+      - mvn
+      - docker_build
