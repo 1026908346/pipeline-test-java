@@ -1,6 +1,27 @@
 version: 2.1
 
 jobs:
+  hello1:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - run:
+          name: hello1
+          command: echo helloworld1
+  hello2:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - run:
+          name: hello2
+          command: echo helloworld2
+  hello3:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - run:
+          name: hello3
+          command: echo helloworld3
   mvn:
     docker:
       - image: cimg/openjdk:11.0
@@ -23,6 +44,13 @@ workflows:
     jobs:
       - mvn
       - docker_build
+      - hello1
+      - hello2:
+          requires:
+            - hello1
+      - hello3:
+          requires:
+            - hello2
   workflow2:
     jobs:
       - mvn
