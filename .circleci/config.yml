@@ -7,7 +7,7 @@ jobs:
     steps:
       - run:
           name: hello1
-          command: echo helloworld1
+          command: sleep 120 && echo helloworld1
   hello2:
     docker:
       - image: cimg/openjdk:11.0
