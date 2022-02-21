@@ -13,8 +13,17 @@ jobs:
       - image: cimg/openjdk:11.0
     steps:
       - run:
-          name: hello2
-          command: sleep 10s
+          name: hello2-2
+          command: sleep 30s
+      - run:
+          name: hello2-2
+          command: sleep 30s
+      - run:
+          name: hello2-3
+          command: sleep 30s
+      - run:
+          name: hello2-4
+          command: sleep 30s
   hello3:
     docker:
       - image: cimg/openjdk:11.0
