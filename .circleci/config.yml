@@ -7,28 +7,28 @@ jobs:
     steps:
       - run:
           name: hello1
-          command: sleep 120 && echo helloworld1
+          command: sleep 30 && echo helloworld1
   hello2:
     docker:
       - image: cimg/openjdk:11.0
     steps:
       - run:
           name: hello2
-          command: echo helloworld2
+          command: sleep 10s
   hello3:
     docker:
       - image: cimg/openjdk:11.0
     steps:
       - run:
           name: hello3
-          command: echo helloworld3
+          command: sleep 10s
   hello4:
     docker:
       - image: cimg/openjdk:11.0
     steps:
       - run:
           name: hello4
-          command: echo helloworld4
+          command: sleep 10s
   mvn:
     docker:
       - image: cimg/openjdk:11.0
