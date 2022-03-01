@@ -1,76 +1,9 @@
 version: 2.1
-
-jobs:
-  hello1:
-    docker:
-      - image: cimg/openjdk:11.0
-    steps:
-      - run:
-          name: hello1
-          command: sleep 30 && echo helloworld1
-  hello2:
-    docker:
-      - image: cimg/openjdk:11.0
-    steps:
-      - run:
-          name: hello2-2
-          command: sleep 30sada
-      - run:
-          name: hello2-2
-          command: sleep 30s
-      - run:
-          name: hello2-3
-          command: sleep 30s
-      - run:
-          name: hello2-4
-          command: sleep 30s
-  hello3:
-    docker:
-      - image: cimg/openjdk:11.0
-    steps:
-      - run:
-          name: hello3
-          command: sleep 10s
-  hello4:
-    docker:
-      - image: cimg/openjdk:11.0
-    steps:
-      - run:
-          name: hello4
-          command: sleep 10s
-  mvn:
-    docker:
-      - image: cimg/openjdk:11.0
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: mvn -B -DskipTests clean package -Dmaven.test.skip=true
-  docker_build:
-    docker:
-      - image: cimg/openjdk:11.0
-    steps:
-      - checkout
-      - run: docker login --username=liyifeng@xlauncher registry.cn-hangzhou.aliyuncs.com -p=Liyifeng0 
-      - run: docker build -f Dockerfile -t registry.cn-hangzhou.aliyuncs.com/launcher/lyf-demo:v1 
-      - run: docker push registry.cn-hangzhou.aliyuncs.com/launcher/lyf-demo:v1
-
+orbs:
+  spotbugs: cbonoz/maven-spotbugs@0.0.2
 workflows:
-  workflow1:
+  main:
     jobs:
-      - mvn
-      - docker_build
-      - hello1
-      - hello2:
-          requires:
-            - hello1
-      - hello3:
-          requires:
-            - hello2
-      - hello4:
-          requires:
-            - hello1
-  workflow2:
-    jobs:
-      - mvn
-      - docker_build
+      - spotbugs/run:
+          source_directory: src
+          spotbugs_results_path: src/target/site
