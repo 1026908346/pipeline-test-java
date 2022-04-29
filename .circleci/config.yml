@@ -22,4 +22,4 @@ workflows:
      #     source_directory: src
      #     spotbugs_results_path: src/target/site
       - print-a-message:
-          message: Hello!
+          message: Hello world!
