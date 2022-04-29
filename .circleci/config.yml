@@ -4,10 +4,22 @@ orbs:
   maven: circleci/maven@0.0.12
   spotbugs: cbonoz/maven-spotbugs@0.0.2
 
+jobs:
+  print-a-message:
+    docker:
+      - image: cimg/base:2022.03
+    parameters:
+      message:
+        type: string
+    steps:
+      - run: echo << parameters.message >>
+      
 workflows:
   maven_test:
     jobs:
       - maven/test # checkout, build, test, and upload test results 
-      - spotbugs/run:
-          source_directory: src
-          spotbugs_results_path: src/target/site
+     # - spotbugs/run:
+     #     source_directory: src
+     #     spotbugs_results_path: src/target/site
+      - print-a-message:
+          message: Hello!
